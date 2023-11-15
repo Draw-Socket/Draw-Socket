@@ -85,13 +85,18 @@ class CWidget(QWidget):
         gb = QGroupBox('지우개')        
         left.addWidget(gb)
  
-        hbox = QHBoxLayout()
+        hbox = QGridLayout()
         gb.setLayout(hbox)        
          
         self.checkbox  =QCheckBox('지우개 동작')
         self.checkbox.stateChanged.connect(self.checkClicked)
-        hbox.addWidget(self.checkbox)
+        hbox.addWidget(self.checkbox, 0, 0)
+
+        self.comboE = QComboBox()
+        hbox.addWidget(self.comboE, 0, 1)       
  
+        for i in range(1, 21):
+            self.comboE.addItem(str(i))
        
         left.addStretch(1)        
           
@@ -166,13 +171,12 @@ class CView(QGraphicsView):
  
     def mouseMoveEvent(self, e):  
          
-        # e.buttons()는 정수형 값을 리턴, e.button()은 move시 Qt.Nobutton 리턴 
         if e.buttons() & Qt.LeftButton:           
  
             self.end = e.pos()
  
             if self.parent().checkbox.isChecked():
-                pen = QPen(QColor(255,255,255), 10)
+                pen = QPen(QColor(255,255,255), self.parent().comboE.currentIndex())
                 path = QPainterPath()
                 path.moveTo(self.start)
                 path.lineTo(self.end)
@@ -202,10 +206,6 @@ class CView(QGraphicsView):
                 path.moveTo(self.start)
                 path.lineTo(self.end)
                 self.scene.addPath(path, pen)
- 
-                # Line 이용
-                #line = QLineF(self.start.x(), self.start.y(), self.end.x(), self.end.y())
-                #self.scene.addLine(line, pen)
                  
                 # 시작점을 다시 기존 끝점으로
                 self.start = e.pos()
@@ -220,7 +220,8 @@ class CView(QGraphicsView):
  
  
                 rect = QRectF(self.start, self.end)
-                self.items.append(self.scene.addRect(rect, pen, brush))
+                rPen = QPen(brush.color(), 1)
+                self.items.append(self.scene.addRect(rect, rPen, brush))
                  
             # 원 그리기
             if self.parent().drawType == 3:
@@ -232,7 +233,8 @@ class CView(QGraphicsView):
  
  
                 rect = QRectF(self.start, self.end)
-                self.items.append(self.scene.addEllipse(rect, pen, brush))
+                cPen = QPen(brush.color(), 1)
+                self.items.append(self.scene.addEllipse(rect, cPen, brush))
  
  
     def mouseReleaseEvent(self, e):        
@@ -257,7 +259,8 @@ class CView(QGraphicsView):
  
                 self.items.clear()
                 rect = QRectF(self.start, self.end)
-                self.scene.addRect(rect, pen, brush)
+                cPen = QPen(brush.color(), 1)
+                self.scene.addRect(rect, cPen, brush)
  
             if self.parent().drawType == 3:
  
@@ -265,7 +268,8 @@ class CView(QGraphicsView):
  
                 self.items.clear()
                 rect = QRectF(self.start, self.end)
-                self.scene.addEllipse(rect, pen, brush)
+                rPen = QPen(brush.color(), 1)
+                self.scene.addEllipse(rect, rPen, brush)
  
  
 if __name__ == '__main__':
